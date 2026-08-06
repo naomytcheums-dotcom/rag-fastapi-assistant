@@ -10,8 +10,11 @@ and embedding).
 """
 
 import json
+import logging
 import re
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 RAW_DIR = PROJECT_ROOT / "data" / "raw"
@@ -70,6 +73,15 @@ def resolve_snippet_includes(content):
         repo_relative_path = LEADING_DOTDOT_RE.sub("", raw_path)
         resolved = (FASTAPI_REPO_ROOT / repo_relative_path).resolve()
 
+        # `repo_relative_path` can still contain its own "../" segments
+        # after stripping the leading ones (e.g. "docs_src/../../../etc/passwd")
+        # -- .resolve() happily walks outside FASTAPI_REPO_ROOT if so. Since
+        # this path comes from document content, not trusted code, verify
+        # containment before ever reading the file.
+        if not resolved.is_relative_to(FASTAPI_REPO_ROOT):
+            logger.warning("Blocked snippet include escaping repo root: %r", raw_path)
+            return f"[blocked: path escapes repo root: {raw_path}]"
+
         if not resolved.is_file():
             return f"[missing code snippet: {raw_path}]"
 
@@ -112,7 +124,7 @@ def extract_title(content, fallback):
 
 
 def process_document(md_file_path, doc_id):
-    raw_content = md_file_path.read_text(encoding="utf-8")
+    raw_content = md_file_path.read_text(encoding="utf-8")  # raises on encoding errors -- caller decides how to handle
     cleaned = clean_markdown(raw_content)
     relative_path = md_file_path.relative_to(RAW_DIR)
     section = relative_path.parts[0] if len(relative_path.parts) > 1 else "root"
@@ -136,8 +148,18 @@ def main():
         raise SystemExit(f"No markdown files found under {RAW_DIR}")
 
     docs = []
+    skipped = []
     for doc_id, md_file in enumerate(md_files):
-        doc = process_document(md_file, doc_id)
+        try:
+            doc = process_document(md_file, doc_id)
+        except (OSError, UnicodeDecodeError) as exc:
+            # One bad file (bad encoding, permissions, etc.) shouldn't take
+            # down the whole 155-file batch -- skip it and keep going, but
+            # surface it clearly at the end rather than silently.
+            logger.warning("Skipping %s: %s", md_file, exc)
+            skipped.append(str(md_file))
+            continue
+
         docs.append(doc)
         print(f"processed [{doc['section']}] {doc['path']} ({doc['char_count']} chars)")
 
@@ -148,6 +170,8 @@ def main():
     total_chars = sum(d["char_count"] for d in docs)
     print(f"\nDone: {len(docs)} documents -> {output_path}")
     print(f"Total characters: {total_chars:,}")
+    if skipped:
+        print(f"Skipped {len(skipped)} unreadable file(s): {skipped}")
 
 
 if __name__ == "__main__":

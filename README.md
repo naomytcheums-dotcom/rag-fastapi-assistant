@@ -144,8 +144,11 @@ Documented in full in [`AUDIT.md`](AUDIT.md). The headline ones:
   reranker blend weight was tuned against the same 50-question set now
   used to report the result. A tuning/held-out split is planned but not
   yet done.
-- No automated tests beyond the regression gate yet; no CI for anything
-  other than the retrieval regression check.
+- Unit tests (`tests/test_ingestion.py`, `tests/test_retrieval.py`, 19
+  cases, both run in CI) cover the pure ingestion/retrieval-scoring
+  functions; no tests for `generation.py` yet -- hard to test meaningfully
+  without live API access.
+- No type hints across `src/` yet.
 
 ## Project structure
 

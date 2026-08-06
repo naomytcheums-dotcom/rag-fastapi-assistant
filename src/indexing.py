@@ -124,10 +124,9 @@ def embed_and_store(chunks, embedder):
     CHROMA_DIR.mkdir(parents=True, exist_ok=True)
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
 
-    try:
+    existing_names = {c.name for c in client.list_collections()}
+    if COLLECTION_NAME in existing_names:
         client.delete_collection(COLLECTION_NAME)
-    except Exception:
-        pass
 
     collection = client.create_collection(
         COLLECTION_NAME, metadata={"embedding_model": EMBEDDING_MODEL_NAME}

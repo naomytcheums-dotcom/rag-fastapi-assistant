@@ -14,7 +14,7 @@ SRC_DIR = Path(__file__).resolve().parent.parent / "src"
 sys.path.insert(0, str(SRC_DIR))
 
 from generation import Generator  # noqa: E402
-from retrieval import FINAL_TOP_K, Retriever  # noqa: E402
+from retrieval import CROSS_ENCODER_MODEL_NAME, EMBEDDING_MODEL_NAME, FINAL_TOP_K, Retriever  # noqa: E402
 
 SUGGESTIONS = {
     ":material/http: How do I handle a 404 error?": "How do I handle a 404 error in FastAPI?",
@@ -40,8 +40,8 @@ def get_retriever():
 def get_generator():
     try:
         return Generator()
-    except EnvironmentError as exc:
-        return exc
+    except EnvironmentError:
+        return None
 
 
 if "messages" not in st.session_state:
@@ -59,8 +59,8 @@ with st.sidebar:
     dev_mode = st.toggle("Developer mode", value=False, help="Show retrieval/generation internals and metrics")
 
     st.markdown("---")
-    st.caption(f"Embedding model: `sentence-transformers/all-MiniLM-L6-v2`")
-    st.caption(f"Reranker: `cross-encoder/ms-marco-MiniLM-L-6-v2`")
+    st.caption(f"Embedding model: `{EMBEDDING_MODEL_NAME}`")
+    st.caption(f"Reranker: `{CROSS_ENCODER_MODEL_NAME}`")
     st.caption(f"Top-k retrieved: {FINAL_TOP_K}")
 
 
@@ -114,47 +114,55 @@ if prompt:
         st.write(prompt)
 
     with st.chat_message("assistant"):
+        error_message = None
+        answer_text = ""
+        sources = []
+        metrics = None
+
         with st.status("Searching the docs...", expanded=False) as status:
-            retriever = get_retriever()
+            try:
+                retriever = get_retriever()
+                t0 = time.perf_counter()
+                chunks = retriever.retrieve(prompt, top_k=FINAL_TOP_K)
+                retrieval_ms = round((time.perf_counter() - t0) * 1000)
+            except (RuntimeError, FileNotFoundError, ValueError) as exc:
+                status.update(label="Failed", state="error")
+                error_message = f"Retrieval failed: {exc}"
+                chunks = None
 
-            t0 = time.perf_counter()
-            chunks = retriever.retrieve(prompt, top_k=FINAL_TOP_K)
-            retrieval_ms = round((time.perf_counter() - t0) * 1000)
+            if chunks is not None:
+                status.update(label="Generating answer...")
 
-            status.update(label="Generating answer...")
+                generator = get_generator()
+                generation_ms = None
 
-            generator = get_generator()
-            error_message = None
-            answer_text = ""
-            generation_ms = None
+                if generator is None:
+                    error_message = (
+                        "ANTHROPIC_API_KEY is not configured, so I can't generate an answer -- "
+                        "but retrieval still ran, see the sources below."
+                    )
+                else:
+                    try:
+                        t1 = time.perf_counter()
+                        result = generator.generate(prompt, chunks)
+                        generation_ms = round((time.perf_counter() - t1) * 1000)
+                        answer_text = result["answer"]
+                    except Exception as exc:
+                        error_message = f"Generation failed: {exc}"
 
-            if isinstance(generator, Exception):
-                error_message = (
-                    "ANTHROPIC_API_KEY is not configured, so I can't generate an answer -- "
-                    "but retrieval still ran, see the sources below."
-                )
-            else:
-                try:
-                    t1 = time.perf_counter()
-                    result = generator.generate(prompt, chunks)
-                    generation_ms = round((time.perf_counter() - t1) * 1000)
-                    answer_text = result["answer"]
-                except Exception as exc:
-                    error_message = f"Generation failed: {exc}"
+                sources = [
+                    {
+                        "index": i,
+                        "path": c["path"],
+                        "heading": c["heading"],
+                        "doc_title": c["doc_title"],
+                        "rerank_score": c["rerank_score"],
+                    }
+                    for i, c in enumerate(chunks, start=1)
+                ]
+                metrics = {"retrieval_ms": retrieval_ms, "generation_ms": generation_ms, "n_chunks": len(chunks)}
 
-            status.update(label="Done", state="complete")
-
-        sources = [
-            {
-                "index": i,
-                "path": c["path"],
-                "heading": c["heading"],
-                "doc_title": c["doc_title"],
-                "rerank_score": c["rerank_score"],
-            }
-            for i, c in enumerate(chunks, start=1)
-        ]
-        metrics = {"retrieval_ms": retrieval_ms, "generation_ms": generation_ms, "n_chunks": len(chunks)}
+                status.update(label="Done", state="complete")
 
         if answer_text:
             st.write(answer_text)

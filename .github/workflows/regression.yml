@@ -1,4 +1,4 @@
-name: Retrieval regression check
+name: Tests and retrieval regression check
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  regression:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,6 +18,9 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      - name: Run unit tests (ingestion + retrieval pure functions)
+        run: pytest tests/test_ingestion.py tests/test_retrieval.py -v
 
       - name: Rebuild chunks and vector store from committed data/processed/fastapi_docs.json
         run: python src/indexing.py

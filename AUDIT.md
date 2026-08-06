@@ -11,6 +11,41 @@ project's own stated business model ("Template personnalisé: vendre le
 code pour l'adapter à d'autres documentations") means untrusted input is a
 near-term reality, not a hypothetical.
 
+## Update: fixed since this audit
+
+This document is left as originally written (a point-in-time audit, not a
+living doc) — findings below still describe what was found. Since then,
+action-plan items 1, 2, 4, 5, 7, 8, 9, 10, and 11 have been applied and
+verified:
+
+- Path traversal in `ingestion.py`'s snippet resolver: now blocked with an
+  `is_relative_to()` containment check (`tests/test_ingestion.py` covers it).
+- Vector-store-empty crash: `Retriever.__init__`/`_semantic_search` now
+  raise a clear `RuntimeError` instead of leaking Chroma's raw exception --
+  verified by reproducing the original crash, then re-verifying it's caught.
+- Dashboard: fixed the 3x duplicated model-name strings (now imported from
+  `retrieval.py`), fixed the "exception as cached resource" pattern, and
+  `retriever.retrieve()` is now wrapped so a retrieval failure shows a clean
+  `st.error()` instead of crashing the whole page.
+- `generation.py`: added a 30s client timeout, specific exception handling
+  per Anthropic SDK error type, per-request token/latency logging, and a
+  cost estimate. Fixed the `.env` parser not stripping inline `# comments`
+  (the `st.secrets` fallback for Streamlit Cloud deployment is still open).
+- `indexing.py`: replaced the bare `except Exception: pass` around
+  collection deletion with an explicit existence check.
+- Added `logging` (not just `print`) to `retrieval.py` and `generation.py`.
+- Added `tests/test_ingestion.py` and `tests/test_retrieval.py` (19 tests,
+  all passing) covering the pure functions above plus the RRF fusion and
+  score-blending logic.
+- Dependencies now pinned to actually-tested versions (see requirements.txt)
+  and installed into a `.venv` instead of the global environment.
+
+Not yet done: item 3 (dependency pins -- environment is being rebuilt into
+a `.venv` to determine the exact tested versions), item 6 (tuning/held-out
+split for the Recall@5 methodology), item 12 (type hints across `src/`),
+and item 13 (extracting the dashboard's inline pipeline logic into a
+separately testable function) remain open.
+
 ---
 
 ## 1. Executive summary — top 5 critical issues

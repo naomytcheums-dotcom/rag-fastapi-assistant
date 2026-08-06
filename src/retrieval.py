@@ -12,8 +12,10 @@ rankings without needing to reconcile their very different score scales.
 
 import argparse
 import json
+import logging
 import os
 import re
+import time
 from pathlib import Path
 
 # Must be set before importing transformers/sentence_transformers: if a
@@ -52,7 +54,14 @@ FINAL_TOP_K = 5
 # strong fusion consensus pull a candidate back up.
 RERANK_WEIGHT = 0.85
 
+# Defensive cap: an unbounded user-typed query gets fed to the cross-encoder
+# once per candidate (up to POOL_SIZE times), so a pathologically long
+# query is a cheap way to inflate reranking cost per request.
+MAX_QUERY_CHARS = 500
+
 TOKEN_RE = re.compile(r"[a-zA-Z0-9_]+")
+
+logger = logging.getLogger(__name__)
 
 
 def tokenize(text):
@@ -65,7 +74,14 @@ class Retriever:
         if not chunks_path.exists():
             raise FileNotFoundError(f"{chunks_path} not found -- run src/indexing.py first.")
 
-        self.chunks = json.loads(chunks_path.read_text(encoding="utf-8"))
+        try:
+            self.chunks = json.loads(chunks_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(
+                f"{chunks_path} is not valid JSON (corrupted or truncated write?) -- "
+                "re-run src/indexing.py to regenerate it."
+            ) from exc
+
         self.chunk_by_id = {c["chunk_id"]: c for c in self.chunks}
 
         tokenized_corpus = [tokenize(c["text"]) for c in self.chunks]
@@ -73,14 +89,29 @@ class Retriever:
         self.bm25_ids = [c["chunk_id"] for c in self.chunks]
 
         client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-        self.collection = client.get_collection(COLLECTION_NAME)
+        try:
+            self.collection = client.get_collection(COLLECTION_NAME)
+        except Exception as exc:
+            # chromadb has changed which exception type this raises across
+            # versions (ValueError historically) -- catch broadly and
+            # convert to a specific, actionable error rather than leaking
+            # whatever internal exception this version happens to use.
+            raise RuntimeError(
+                f"Vector store collection '{COLLECTION_NAME}' not found at {CHROMA_DIR} -- "
+                "the vector store is empty or missing. Run src/indexing.py first."
+            ) from exc
+
+        logger.info("Loaded %d chunks, BM25 index, and Chroma collection '%s'", len(self.chunks), COLLECTION_NAME)
 
         self.embedder = SentenceTransformer(EMBEDDING_MODEL_NAME)
         self.reranker = CrossEncoder(CROSS_ENCODER_MODEL_NAME)
 
     def _semantic_search(self, query, n):
         query_embedding = self.embedder.encode([query]).tolist()
-        results = self.collection.query(query_embeddings=query_embedding, n_results=n)
+        try:
+            results = self.collection.query(query_embeddings=query_embedding, n_results=n)
+        except Exception as exc:
+            raise RuntimeError(f"Semantic search against the vector store failed: {exc}") from exc
         return results["ids"][0]
 
     def _bm25_search(self, query, n):
@@ -112,6 +143,11 @@ class Retriever:
         return [rerank_weight * r + (1 - rerank_weight) * f for r, f in zip(norm_rerank, norm_rrf)]
 
     def retrieve(self, query, top_k=FINAL_TOP_K):
+        query = query.strip()[:MAX_QUERY_CHARS]
+        if not query:
+            raise ValueError("query must not be empty")
+
+        start = time.perf_counter()
         semantic_ids = self._semantic_search(query, SEMANTIC_CANDIDATES)
         bm25_ids = self._bm25_search(query, BM25_CANDIDATES)
 
@@ -128,10 +164,17 @@ class Retriever:
         reranked = sorted(
             zip(candidates, rerank_scores, blended_scores), key=lambda item: item[2], reverse=True
         )
-        return [
+        results = [
             {**chunk, "rerank_score": float(rerank_score), "blended_score": float(blended_score)}
             for chunk, rerank_score, blended_score in reranked[:top_k]
         ]
+
+        elapsed_ms = round((time.perf_counter() - start) * 1000)
+        logger.info(
+            "retrieve() query=%r -> %d results in %dms (top path=%s)",
+            query[:80], len(results), elapsed_ms, results[0]["path"] if results else None,
+        )
+        return results
 
 
 def main():
@@ -151,4 +194,5 @@ def main():
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
     main()

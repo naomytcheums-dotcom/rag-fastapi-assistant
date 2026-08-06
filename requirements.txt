@@ -1,23 +1,31 @@
+# Exact versions frozen from the environment this project was actually
+# built and tested against (Python 3.13, Windows). Pinned deliberately --
+# see AUDIT.md: an earlier unpinned `anthropic` install resolved to 0.34.2,
+# which crashed on every call because it passes a `proxies` kwarg to httpx
+# that httpx>=0.28 no longer accepts. If you need a different version,
+# relax the pin and re-run `pytest tests/` + `python tests/test_regression.py`
+# before trusting the result.
+
 # Stage 1: ingestion (src/ingestion.py)
 # Uses only the Python standard library -- no external packages required.
 
 # Stage 2: indexing (src/indexing.py)
-sentence-transformers
-chromadb
+sentence-transformers==5.7.0
+chromadb==1.5.9
 
 # Stage 3: retrieval (src/retrieval.py)
-rank-bm25
+rank-bm25==0.2.2
 
 # Stage 4: generation (src/generation.py)
-# >=0.68 required: older versions pass a `proxies` kwarg to httpx that
-# recent httpx releases (>=0.28) no longer accept.
-anthropic>=0.68
+anthropic==0.120.2
 
 # Stage 5: evaluation (src/evaluation.py) -- no extra deps, uses retrieval.py
 
-# Stage 7: dashboard (dashboard/app.py)
-streamlit
+# Stage 6 (failure analysis, LLM judge, hallucination detection) -- no
+# extra deps beyond anthropic above
 
-# Stage 6 (failure analysis) will add dependencies here as we build it,
-# e.g.:
-#   ragas
+# Stage 7: dashboard (dashboard/app.py)
+streamlit==1.61.1
+
+# Tests (tests/test_*.py)
+pytest==9.1.1
