@@ -1,0 +1,402 @@
+[
+  {
+    "id": "q001",
+    "difficulty": "easy",
+    "topic": "routing",
+    "question": "How do you create a basic FastAPI application instance?",
+    "answer": "You import FastAPI and instantiate it: `from fastapi import FastAPI` then `app = FastAPI()`. This `app` object is the main point of interaction for creating all your API routes.",
+    "documents": ["tutorial/first-steps.md"]
+  },
+  {
+    "id": "q002",
+    "difficulty": "easy",
+    "topic": "routing",
+    "question": "How do you declare a GET route in FastAPI?",
+    "answer": "Use the `@app.get(\"/path\")` decorator above a function. FastAPI calls this a path operation decorator, and the decorated function is the path operation function.",
+    "documents": ["tutorial/first-steps.md"]
+  },
+  {
+    "id": "q003",
+    "difficulty": "easy",
+    "topic": "routing",
+    "question": "How do you declare a POST route that accepts a JSON request body?",
+    "answer": "Decorate a function with `@app.post(\"/path\")` and add a parameter typed as a Pydantic model; FastAPI reads the JSON body and validates it against that model automatically.",
+    "documents": ["tutorial/body.md"]
+  },
+  {
+    "id": "q004",
+    "difficulty": "easy",
+    "topic": "routing",
+    "question": "How do you declare a PUT route to update an existing resource?",
+    "answer": "Use the `@app.put(\"/path\")` decorator the same way you would `@app.get()` or `@app.post()`, typically combined with a Pydantic model parameter representing the updated resource.",
+    "documents": ["tutorial/body-updates.md"]
+  },
+  {
+    "id": "q005",
+    "difficulty": "easy",
+    "topic": "routing",
+    "question": "What HTTP method decorators does FastAPI provide for defining routes?",
+    "answer": "FastAPI provides one decorator per HTTP operation on the `app` (or `APIRouter`) object: `@app.get()`, `@app.post()`, `@app.put()`, `@app.delete()`, `@app.patch()`, plus `@app.options()`, `@app.head()`, and `@app.trace()`.",
+    "documents": ["tutorial/first-steps.md"]
+  },
+  {
+    "id": "q006",
+    "difficulty": "easy",
+    "topic": "parameters",
+    "question": "How do you declare a path parameter in FastAPI?",
+    "answer": "Include the parameter name in curly braces in the route path, e.g. `@app.get(\"/items/{item_id}\")`, and add a matching function argument, e.g. `def read_item(item_id: int):`. FastAPI parses and validates it based on the type hint.",
+    "documents": ["tutorial/path-params.md"]
+  },
+  {
+    "id": "q007",
+    "difficulty": "easy",
+    "topic": "parameters",
+    "question": "How do you declare a query parameter in FastAPI?",
+    "answer": "Add a function parameter that is not part of the path; FastAPI treats it as a query parameter automatically, e.g. `def read_items(skip: int = 0, limit: int = 10):` reads `?skip=..&limit=..` from the URL.",
+    "documents": ["tutorial/query-params.md"]
+  },
+  {
+    "id": "q008",
+    "difficulty": "easy",
+    "topic": "parameters",
+    "question": "How do you make a query parameter optional with a default value?",
+    "answer": "Give the function parameter a default value, e.g. `q: str | None = None`; if the client doesn't send it, FastAPI uses the default instead of requiring it.",
+    "documents": ["tutorial/query-params.md"]
+  },
+  {
+    "id": "q009",
+    "difficulty": "easy",
+    "topic": "parameters",
+    "question": "How do you declare a header parameter in FastAPI?",
+    "answer": "Import `Header` from fastapi and use it as the parameter's default, e.g. `user_agent: str | None = Header(default=None)`; FastAPI converts the parameter name to kebab-case to match standard HTTP header naming.",
+    "documents": ["tutorial/header-params.md"]
+  },
+  {
+    "id": "q010",
+    "difficulty": "easy",
+    "topic": "parameters",
+    "question": "How do you declare a cookie parameter in FastAPI?",
+    "answer": "Import `Cookie` from fastapi and use it as the parameter's default, e.g. `ads_id: str | None = Cookie(default=None)`; FastAPI reads the value from the incoming request's cookies.",
+    "documents": ["tutorial/cookie-params.md"]
+  },
+  {
+    "id": "q011",
+    "difficulty": "easy",
+    "topic": "validation",
+    "question": "How do you declare a request body using a Pydantic model?",
+    "answer": "Define a class that inherits from `pydantic.BaseModel` with typed attributes, then use it as a function parameter's type; FastAPI reads the JSON body, validates it, and gives you a model instance.",
+    "documents": ["tutorial/body.md"]
+  },
+  {
+    "id": "q012",
+    "difficulty": "easy",
+    "topic": "validation",
+    "question": "How do you add numeric validation constraints (like a minimum value) to a path parameter?",
+    "answer": "Use `Path()` from fastapi as the parameter's default with constraints such as `gt`, `ge`, `lt`, `le`, e.g. `item_id: int = Path(gt=0)` requires it to be greater than zero.",
+    "documents": ["tutorial/path-params-numeric-validations.md"]
+  },
+  {
+    "id": "q013",
+    "difficulty": "easy",
+    "topic": "async",
+    "question": "What is the difference between declaring a path operation function with `async def` versus plain `def`?",
+    "answer": "`async def` functions run directly in FastAPI's event loop and are best for I/O-bound code using `await` (e.g. async DB drivers, httpx). Plain `def` functions are automatically run in an external threadpool, which is useful for blocking/synchronous code so it doesn't block the event loop.",
+    "documents": ["async.md"]
+  },
+  {
+    "id": "q014",
+    "difficulty": "easy",
+    "topic": "errors",
+    "question": "How do you return a 404 error when a requested item doesn't exist?",
+    "answer": "Import `HTTPException` from fastapi and raise it: `raise HTTPException(status_code=404, detail=\"Item not found\")`. FastAPI catches it and returns the proper JSON error response.",
+    "documents": ["tutorial/handling-errors.md"]
+  },
+  {
+    "id": "q015",
+    "difficulty": "easy",
+    "topic": "response",
+    "question": "How do you set a custom HTTP status code for a successful response?",
+    "answer": "Pass the `status_code` argument to the path operation decorator, e.g. `@app.post(\"/items/\", status_code=201)`, or import constants from `fastapi.status` like `status.HTTP_201_CREATED`.",
+    "documents": ["tutorial/response-status-code.md"]
+  },
+  {
+    "id": "q016",
+    "difficulty": "easy",
+    "topic": "metadata",
+    "question": "How do you add a title and description to your FastAPI application for the docs?",
+    "answer": "Pass metadata arguments when creating the app, e.g. `app = FastAPI(title=\"My API\", description=\"...\", version=\"1.0.0\")`. These values show up in the automatically generated OpenAPI docs.",
+    "documents": ["tutorial/metadata.md"]
+  },
+  {
+    "id": "q017",
+    "difficulty": "easy",
+    "topic": "static-files",
+    "question": "How do you serve static files (like CSS or images) with FastAPI?",
+    "answer": "Import `StaticFiles` from `fastapi.staticfiles` and mount it: `app.mount(\"/static\", StaticFiles(directory=\"static\"), name=\"static\")`.",
+    "documents": ["tutorial/static-files.md"]
+  },
+  {
+    "id": "q018",
+    "difficulty": "easy",
+    "topic": "openapi",
+    "question": "Where can you find the automatically generated interactive API documentation for a FastAPI app?",
+    "answer": "FastAPI serves interactive Swagger UI docs at `/docs` and alternative ReDoc documentation at `/redoc` by default, both generated from the app's OpenAPI schema.",
+    "documents": ["tutorial/first-steps.md", "features.md"]
+  },
+  {
+    "id": "q019",
+    "difficulty": "easy",
+    "topic": "running",
+    "question": "How do you run a FastAPI application locally with auto-reload during development?",
+    "answer": "Run `fastapi dev main.py` from the command line (using the FastAPI CLI), which starts a development server with auto-reload enabled.",
+    "documents": ["tutorial/first-steps.md"]
+  },
+  {
+    "id": "q020",
+    "difficulty": "easy",
+    "topic": "response",
+    "question": "How do you declare multiple body parameters in a single path operation?",
+    "answer": "Declare more than one Pydantic model parameter in the function signature; FastAPI expects each one as a nested key in the JSON body, named after the parameter, instead of a single flat body.",
+    "documents": ["tutorial/body-multiple-params.md"]
+  },
+  {
+    "id": "q021",
+    "difficulty": "medium",
+    "topic": "dependencies",
+    "question": "How do you declare a reusable dependency with FastAPI's Depends?",
+    "answer": "Write a callable (function or class) that returns the value you need, then use it as a parameter default via `Depends(...)`, e.g. `def endpoint(commons: dict = Depends(common_parameters)):`. FastAPI calls it and injects the result.",
+    "documents": ["tutorial/dependencies/index.md"]
+  },
+  {
+    "id": "q022",
+    "difficulty": "medium",
+    "topic": "dependencies",
+    "question": "How do you create a class-based dependency in FastAPI?",
+    "answer": "Define a class with an `__init__` method whose parameters describe what to inject, then use the class itself with `Depends(ClassName)`; FastAPI instantiates it and treats the instance as the dependency's value.",
+    "documents": ["tutorial/dependencies/classes-as-dependencies.md"]
+  },
+  {
+    "id": "q023",
+    "difficulty": "medium",
+    "topic": "dependencies",
+    "question": "How do you create a dependency that runs cleanup code after the request is handled?",
+    "answer": "Write a generator function using `yield` instead of `return`; the code before `yield` runs before the request, and the code after `yield` runs as cleanup after the response is sent (e.g. closing a database session).",
+    "documents": ["tutorial/dependencies/dependencies-with-yield.md"]
+  },
+  {
+    "id": "q024",
+    "difficulty": "medium",
+    "topic": "dependencies",
+    "question": "How do you apply a dependency to every path operation in an entire application?",
+    "answer": "Pass a `dependencies` list to the `FastAPI()` constructor, e.g. `app = FastAPI(dependencies=[Depends(verify_token)])`; it runs for every request regardless of the specific route.",
+    "documents": ["tutorial/dependencies/global-dependencies.md"]
+  },
+  {
+    "id": "q025",
+    "difficulty": "medium",
+    "topic": "middleware",
+    "question": "How do you add a custom middleware to a FastAPI application?",
+    "answer": "Use the `@app.middleware(\"http\")` decorator on an async function that takes `request` and `call_next`, calls `await call_next(request)` to continue processing, and can modify the request or response around that call.",
+    "documents": ["tutorial/middleware.md"]
+  },
+  {
+    "id": "q026",
+    "difficulty": "medium",
+    "topic": "cors",
+    "question": "How do you enable CORS (Cross-Origin Resource Sharing) in a FastAPI application?",
+    "answer": "Import `CORSMiddleware` from `fastapi.middleware.cors` and add it with `app.add_middleware(CORSMiddleware, allow_origins=[...], allow_methods=[...], allow_headers=[...])` to allow browsers on other origins to call the API.",
+    "documents": ["tutorial/cors.md"]
+  },
+  {
+    "id": "q027",
+    "difficulty": "medium",
+    "topic": "security",
+    "question": "How do you implement OAuth2 password flow authentication in FastAPI?",
+    "answer": "Use `OAuth2PasswordBearer` (or `OAuth2PasswordRequestForm` for the login endpoint) from `fastapi.security` to declare a dependency that extracts the bearer token from the `Authorization` header, which FastAPI also uses to configure the docs' authentication UI.",
+    "documents": ["tutorial/security/first-steps.md"]
+  },
+  {
+    "id": "q028",
+    "difficulty": "medium",
+    "topic": "security",
+    "question": "How do you retrieve the currently authenticated user inside a path operation?",
+    "answer": "Create a dependency (e.g. `get_current_user`) that decodes/validates the token obtained via `OAuth2PasswordBearer` and returns the corresponding user object, then inject it with `Depends(get_current_user)` in any route that needs it.",
+    "documents": ["tutorial/security/get-current-user.md"]
+  },
+  {
+    "id": "q029",
+    "difficulty": "medium",
+    "topic": "security",
+    "question": "How do you hash passwords and issue JWT access tokens for login in FastAPI?",
+    "answer": "Hash passwords with a library like passlib (e.g. bcrypt) before storing them, verify them the same way at login, then encode a JWT with a library like python-jose containing the user identity and an expiration, returned as the access token.",
+    "documents": ["tutorial/security/oauth2-jwt.md"]
+  },
+  {
+    "id": "q030",
+    "difficulty": "medium",
+    "topic": "websockets",
+    "question": "How do you define a WebSocket endpoint in FastAPI?",
+    "answer": "Use the `@app.websocket(\"/ws\")` decorator on an async function that receives a `WebSocket` parameter, call `await websocket.accept()`, then use `await websocket.receive_text()` / `await websocket.send_text()` in a loop.",
+    "documents": ["advanced/websockets.md"]
+  },
+  {
+    "id": "q031",
+    "difficulty": "medium",
+    "topic": "background-tasks",
+    "question": "How do you run a background task after returning a response to the client?",
+    "answer": "Add a `BackgroundTasks` parameter to your path operation function, call `background_tasks.add_task(func, *args)`, and FastAPI runs it after the response has already been sent.",
+    "documents": ["tutorial/background-tasks.md"]
+  },
+  {
+    "id": "q032",
+    "difficulty": "medium",
+    "topic": "testing",
+    "question": "How do you test a FastAPI application without running a live server?",
+    "answer": "Import `TestClient` from `fastapi.testclient`, instantiate it with your `app` (`client = TestClient(app)`), then call methods like `client.get(\"/\")` and assert on the response, similar to using `requests`.",
+    "documents": ["tutorial/testing.md"]
+  },
+  {
+    "id": "q033",
+    "difficulty": "medium",
+    "topic": "response-model",
+    "question": "How do you control what fields are returned in the response using response_model?",
+    "answer": "Pass a Pydantic model to the `response_model` argument of the path operation decorator, e.g. `@app.post(\"/items/\", response_model=ItemOut)`; FastAPI filters and validates the output data against that model, even if you return more fields internally.",
+    "documents": ["tutorial/response-model.md"]
+  },
+  {
+    "id": "q034",
+    "difficulty": "medium",
+    "topic": "file-upload",
+    "question": "How do you accept a file upload in a FastAPI endpoint?",
+    "answer": "Add a parameter typed `UploadFile` (optionally wrapped in `File(...)`) from fastapi, e.g. `async def create_upload_file(file: UploadFile):`; FastAPI streams the file and exposes attributes like `file.filename` and async methods like `await file.read()`.",
+    "documents": ["tutorial/request-files.md"]
+  },
+  {
+    "id": "q035",
+    "difficulty": "medium",
+    "topic": "file-upload",
+    "question": "How do you accept both form fields and file uploads in the same request?",
+    "answer": "Declare parameters using both `Form(...)` for regular fields and `File(...)`/`UploadFile` for files in the same function signature; FastAPI parses the request as `multipart/form-data` automatically.",
+    "documents": ["tutorial/request-forms-and-files.md"]
+  },
+  {
+    "id": "q036",
+    "difficulty": "medium",
+    "topic": "routing",
+    "question": "How do you organize a large FastAPI application using multiple routers?",
+    "answer": "Create an `APIRouter()` instance per module, define routes on it the same way as on `app`, then include it in the main app with `app.include_router(router, prefix=\"/items\", tags=[\"items\"])`.",
+    "documents": ["tutorial/bigger-applications.md"]
+  },
+  {
+    "id": "q037",
+    "difficulty": "medium",
+    "topic": "validation",
+    "question": "How do you add string length or regex constraints to a query parameter?",
+    "answer": "Use `Query()` from fastapi as the default value with constraints like `min_length`, `max_length`, or `pattern`, e.g. `q: str | None = Query(default=None, min_length=3, max_length=50)`.",
+    "documents": ["tutorial/query-params-str-validations.md"]
+  },
+  {
+    "id": "q038",
+    "difficulty": "medium",
+    "topic": "validation",
+    "question": "How do you declare a request body with nested Pydantic models, like a list of sub-objects?",
+    "answer": "Type an attribute of your Pydantic model as another Pydantic model (or `list[SubModel]`); FastAPI/Pydantic validates the nested structure recursively from the JSON body.",
+    "documents": ["tutorial/body-nested-models.md"]
+  },
+  {
+    "id": "q039",
+    "difficulty": "medium",
+    "topic": "validation",
+    "question": "How do you add extra validation and metadata (like a description) to a specific Pydantic model field?",
+    "answer": "Use `Field(...)` from pydantic as the attribute's default, e.g. `price: float = Field(gt=0, description=\"The price must be greater than zero\")`.",
+    "documents": ["tutorial/body-fields.md"]
+  },
+  {
+    "id": "q040",
+    "difficulty": "medium",
+    "topic": "deployment",
+    "question": "What does it mean to deploy a FastAPI application, and what server is typically used to run it in production?",
+    "answer": "Deploying means making the app available for users to access reliably; FastAPI apps are ASGI applications typically run with an ASGI server like Uvicorn (often via the `fastapi run` command), optionally with multiple worker processes.",
+    "documents": ["deployment/index.md", "deployment/concepts.md"]
+  },
+  {
+    "id": "q041",
+    "difficulty": "hard",
+    "topic": "security",
+    "question": "How do you implement OAuth2 scopes to restrict what a token is allowed to do?",
+    "answer": "Declare scopes when creating `OAuth2PasswordBearer(scopes={...})`, include requested scopes when issuing the JWT, then depend on `SecurityScopes` in protected endpoints to verify the token's scopes include the ones required for that operation, raising an HTTPException if not.",
+    "documents": ["advanced/security/oauth2-scopes.md"]
+  },
+  {
+    "id": "q042",
+    "difficulty": "hard",
+    "topic": "dependencies",
+    "question": "How do you create sub-dependencies, where one dependency itself depends on another?",
+    "answer": "Write a dependency function that declares its own parameter using `Depends(other_dependency)`; FastAPI resolves the dependency graph recursively and, by default, caches the result within a single request if the same dependency is needed more than once.",
+    "documents": ["tutorial/dependencies/sub-dependencies.md"]
+  },
+  {
+    "id": "q043",
+    "difficulty": "hard",
+    "topic": "openapi",
+    "question": "How do you customize the generated OpenAPI schema, for example to change its structure before it's served?",
+    "answer": "Write a function that calls `get_openapi(...)` to build the schema dict, modify it as needed, cache it, and assign a function returning it to `app.openapi`, overriding FastAPI's default schema-generation behavior.",
+    "documents": ["how-to/extending-openapi.md"]
+  },
+  {
+    "id": "q044",
+    "difficulty": "hard",
+    "topic": "advanced-architecture",
+    "question": "How do you mount a completely independent sub-application inside a FastAPI app?",
+    "answer": "Create a separate `FastAPI()` instance for the sub-application and mount it on the main app with `app.mount(\"/sub-path\", sub_app)`; the sub-app gets its own independent OpenAPI schema and docs, isolated from the parent app.",
+    "documents": ["advanced/sub-applications.md"]
+  },
+  {
+    "id": "q045",
+    "difficulty": "hard",
+    "topic": "deployment",
+    "question": "How do you configure FastAPI to work correctly behind a reverse proxy that serves it under a URL path prefix?",
+    "answer": "Configure the ASGI server with a `--root-path` (Uvicorn) matching the prefix the proxy strips, or set `root_path` when creating `FastAPI()`; this ensures generated URLs and the OpenAPI schema's `servers` reflect the externally visible path.",
+    "documents": ["advanced/behind-a-proxy.md"]
+  },
+  {
+    "id": "q046",
+    "difficulty": "hard",
+    "topic": "testing",
+    "question": "How do you write automated tests for a WebSocket endpoint?",
+    "answer": "Use `TestClient`'s `client.websocket_connect(\"/ws\")` as a context manager, which returns a connected test websocket you can call `send_text()`/`receive_text()` on, letting you assert on the exchanged messages synchronously in a test.",
+    "documents": ["advanced/testing-websockets.md"]
+  },
+  {
+    "id": "q047",
+    "difficulty": "hard",
+    "topic": "testing",
+    "question": "How do you override a dependency with a mock or test version during testing?",
+    "answer": "Set `app.dependency_overrides[original_dependency] = override_function` before running tests; FastAPI will call the override instead of the original whenever that dependency is required, and you can clear it afterward via `app.dependency_overrides = {}`.",
+    "documents": ["advanced/testing-dependencies.md"]
+  },
+  {
+    "id": "q048",
+    "difficulty": "hard",
+    "topic": "streaming",
+    "question": "How do you stream a response to the client instead of sending the full body at once?",
+    "answer": "Return a `StreamingResponse` from `fastapi.responses`, passing it a generator (or async generator) that yields chunks of data; FastAPI sends each chunk to the client as it's produced instead of buffering the whole response.",
+    "documents": ["advanced/stream-data.md"]
+  },
+  {
+    "id": "q049",
+    "difficulty": "hard",
+    "topic": "lifecycle",
+    "question": "How do you run startup and shutdown logic for a FastAPI application, such as initializing a database connection pool?",
+    "answer": "Define an async context manager decorated with `@asynccontextmanager` that runs setup code before `yield` and teardown code after it, then pass it to `FastAPI(lifespan=lifespan_function)`.",
+    "documents": ["advanced/events.md"]
+  },
+  {
+    "id": "q050",
+    "difficulty": "hard",
+    "topic": "deployment",
+    "question": "How do you containerize and deploy a FastAPI application using Docker?",
+    "answer": "Write a Dockerfile based on a Python image that copies your code, installs dependencies from requirements.txt, and sets a CMD running the app with an ASGI server (e.g. `uvicorn` or the `fastapi run` command) listening on the container's exposed port.",
+    "documents": ["deployment/docker.md"]
+  }
+]

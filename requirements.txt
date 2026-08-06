@@ -1,0 +1,23 @@
+# Stage 1: ingestion (src/ingestion.py)
+# Uses only the Python standard library -- no external packages required.
+
+# Stage 2: indexing (src/indexing.py)
+sentence-transformers
+chromadb
+
+# Stage 3: retrieval (src/retrieval.py)
+rank-bm25
+
+# Stage 4: generation (src/generation.py)
+# >=0.68 required: older versions pass a `proxies` kwarg to httpx that
+# recent httpx releases (>=0.28) no longer accept.
+anthropic>=0.68
+
+# Stage 5: evaluation (src/evaluation.py) -- no extra deps, uses retrieval.py
+
+# Stage 7: dashboard (dashboard/app.py)
+streamlit
+
+# Stage 6 (failure analysis) will add dependencies here as we build it,
+# e.g.:
+#   ragas

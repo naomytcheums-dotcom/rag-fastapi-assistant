@@ -1,0 +1,153 @@
+[
+  {
+    "id": "q002",
+    "difficulty": "easy",
+    "topic": "routing",
+    "question": "How do you declare a GET route in FastAPI?",
+    "gold_documents": [
+      "tutorial/first-steps.md"
+    ],
+    "retrieved_documents": [
+      "advanced/using-request-directly.md",
+      "advanced/response-headers.md",
+      "advanced/security/oauth2-scopes.md",
+      "how-to/custom-request-and-route.md",
+      "advanced/using-request-directly.md"
+    ],
+    "hit_at_k": false,
+    "reciprocal_rank": 0.0,
+    "diagnosis": {
+      "semantic_rank": 19,
+      "bm25_rank": null,
+      "fused_rank": 34,
+      "stage": "lost_in_fusion_pool_size",
+      "explanation": "The gold chunk was found (semantic rank=19, BM25 rank=None) but ranked below the top-20 cutoff used to build the reranking pool."
+    }
+  },
+  {
+    "id": "q017",
+    "difficulty": "easy",
+    "topic": "static-files",
+    "question": "How do you serve static files (like CSS or images) with FastAPI?",
+    "gold_documents": [
+      "tutorial/static-files.md"
+    ],
+    "retrieved_documents": [
+      "reference/staticfiles.md",
+      "advanced/templates.md",
+      "how-to/custom-docs-ui-assets.md",
+      "how-to/custom-docs-ui-assets.md",
+      "tutorial/frontend.md"
+    ],
+    "hit_at_k": false,
+    "reciprocal_rank": 0.0,
+    "diagnosis": {
+      "semantic_rank": 3,
+      "bm25_rank": 9,
+      "fused_rank": 9,
+      "stage": "demoted_by_reranker",
+      "explanation": "The gold chunk reached the reranking candidate pool but the cross-encoder scored other chunks higher -- either a reranker miscalibration, or the \"wrong\" chunks are genuinely just as relevant (an annotation issue, not a retrieval bug)."
+    }
+  },
+  {
+    "id": "q019",
+    "difficulty": "easy",
+    "topic": "running",
+    "question": "How do you run a FastAPI application locally with auto-reload during development?",
+    "gold_documents": [
+      "tutorial/first-steps.md"
+    ],
+    "retrieved_documents": [
+      "fastapi-cli.md",
+      "fastapi-cli.md",
+      "index.md",
+      "tutorial/index.md",
+      "deployment/concepts.md"
+    ],
+    "hit_at_k": false,
+    "reciprocal_rank": 0.0,
+    "diagnosis": {
+      "semantic_rank": 5,
+      "bm25_rank": 15,
+      "fused_rank": 7,
+      "stage": "demoted_by_reranker",
+      "explanation": "The gold chunk reached the reranking candidate pool but the cross-encoder scored other chunks higher -- either a reranker miscalibration, or the \"wrong\" chunks are genuinely just as relevant (an annotation issue, not a retrieval bug)."
+    }
+  },
+  {
+    "id": "q024",
+    "difficulty": "medium",
+    "topic": "dependencies",
+    "question": "How do you apply a dependency to every path operation in an entire application?",
+    "gold_documents": [
+      "tutorial/dependencies/global-dependencies.md"
+    ],
+    "retrieved_documents": [
+      "tutorial/dependencies/dependencies-in-path-operation-decorators.md",
+      "tutorial/dependencies/dependencies-in-path-operation-decorators.md",
+      "tutorial/dependencies/dependencies-in-path-operation-decorators.md",
+      "tutorial/dependencies/sub-dependencies.md",
+      "tutorial/bigger-applications.md"
+    ],
+    "hit_at_k": false,
+    "reciprocal_rank": 0.0,
+    "diagnosis": {
+      "semantic_rank": 2,
+      "bm25_rank": 12,
+      "fused_rank": 5,
+      "stage": "demoted_by_reranker",
+      "explanation": "The gold chunk reached the reranking candidate pool but the cross-encoder scored other chunks higher -- either a reranker miscalibration, or the \"wrong\" chunks are genuinely just as relevant (an annotation issue, not a retrieval bug)."
+    }
+  },
+  {
+    "id": "q040",
+    "difficulty": "medium",
+    "topic": "deployment",
+    "question": "What does it mean to deploy a FastAPI application, and what server is typically used to run it in production?",
+    "gold_documents": [
+      "deployment/concepts.md",
+      "deployment/index.md"
+    ],
+    "retrieved_documents": [
+      "fastapi-cli.md",
+      "deployment/manually.md",
+      "fastapi-cli.md",
+      "deployment/manually.md",
+      "fastapi-cli.md"
+    ],
+    "hit_at_k": false,
+    "reciprocal_rank": 0.0,
+    "diagnosis": {
+      "semantic_rank": 1,
+      "bm25_rank": 1,
+      "fused_rank": 2,
+      "stage": "demoted_by_reranker",
+      "explanation": "The gold chunk reached the reranking candidate pool but the cross-encoder scored other chunks higher -- either a reranker miscalibration, or the \"wrong\" chunks are genuinely just as relevant (an annotation issue, not a retrieval bug)."
+    }
+  },
+  {
+    "id": "q048",
+    "difficulty": "hard",
+    "topic": "streaming",
+    "question": "How do you stream a response to the client instead of sending the full body at once?",
+    "gold_documents": [
+      "advanced/stream-data.md"
+    ],
+    "retrieved_documents": [
+      "tutorial/body.md",
+      "tutorial/stream-json-lines.md",
+      "tutorial/stream-json-lines.md",
+      "tutorial/testing.md",
+      "tutorial/server-sent-events.md"
+    ],
+    "hit_at_k": false,
+    "reciprocal_rank": 0.0,
+    "diagnosis": {
+      "semantic_rank": 6,
+      "bm25_rank": null,
+      "fused_rank": 12,
+      "stage": "demoted_by_reranker",
+      "explanation": "The gold chunk reached the reranking candidate pool but the cross-encoder scored other chunks higher -- either a reranker miscalibration, or the \"wrong\" chunks are genuinely just as relevant (an annotation issue, not a retrieval bug)."
+    }
+  }
+]
