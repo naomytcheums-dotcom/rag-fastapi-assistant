@@ -29,3 +29,6 @@ streamlit==1.61.1
 
 # Tests (tests/test_*.py)
 pytest==9.1.1
+
+# Reporting (src/generate_charts.py)
+matplotlib==3.10.8

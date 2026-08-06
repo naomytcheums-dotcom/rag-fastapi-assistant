@@ -4,6 +4,7 @@ Chat dashboard for the FastAPI documentation RAG assistant.
 Run with: streamlit run dashboard/app.py
 """
 
+import os
 import sys
 import time
 from pathlib import Path
@@ -13,8 +14,19 @@ import streamlit as st
 SRC_DIR = Path(__file__).resolve().parent.parent / "src"
 sys.path.insert(0, str(SRC_DIR))
 
+import indexing  # noqa: E402
 from generation import Generator  # noqa: E402
 from retrieval import CROSS_ENCODER_MODEL_NAME, EMBEDDING_MODEL_NAME, FINAL_TOP_K, Retriever  # noqa: E402
+
+# On Streamlit Community Cloud, secrets are set via the dashboard's Secrets
+# UI and read through st.secrets -- they are NOT automatically exported as
+# OS environment variables the way a local .env is. Bridge it here, once,
+# before anything reads os.environ["ANTHROPIC_API_KEY"].
+try:
+    if "ANTHROPIC_API_KEY" in st.secrets:
+        os.environ.setdefault("ANTHROPIC_API_KEY", st.secrets["ANTHROPIC_API_KEY"])
+except Exception:
+    pass  # no secrets.toml at all (e.g. local dev without one) -- fine, .env covers that case
 
 SUGGESTIONS = {
     ":material/http: How do I handle a 404 error?": "How do I handle a 404 error in FastAPI?",
@@ -33,7 +45,17 @@ st.set_page_config(
 
 @st.cache_resource(show_spinner="Loading retriever (embeddings + BM25 + reranker)...")
 def get_retriever():
-    return Retriever()
+    try:
+        return Retriever()
+    except (RuntimeError, FileNotFoundError):
+        # Fresh deployment (e.g. Streamlit Community Cloud): data/chroma is
+        # gitignored (binary, derived, too large to commit), but the
+        # cleaned data/processed/fastapi_docs.json is committed. Bootstrap
+        # the vector store from it on first load instead of failing --
+        # slow (~1-2 min, one time per deployment restart) but self-healing.
+        with st.spinner("First run: building the vector store from committed data, this takes a minute..."):
+            indexing.main()
+        return Retriever()
 
 
 @st.cache_resource(show_spinner=False)

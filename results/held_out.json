@@ -1,0 +1,297 @@
+{
+  "summary": {
+    "n_questions": 15,
+    "recall_at_k": 1.0,
+    "mrr": 0.7688888888888888,
+    "by_difficulty": {
+      "easy": {
+        "n_questions": 6,
+        "recall_at_k": 1.0,
+        "mrr": 0.638888888888889
+      },
+      "medium": {
+        "n_questions": 6,
+        "recall_at_k": 1.0,
+        "mrr": 0.8666666666666667
+      },
+      "hard": {
+        "n_questions": 3,
+        "recall_at_k": 1.0,
+        "mrr": 0.8333333333333334
+      }
+    }
+  },
+  "per_question": [
+    {
+      "id": "q003",
+      "difficulty": "easy",
+      "topic": "routing",
+      "question": "How do you declare a POST route that accepts a JSON request body?",
+      "gold_documents": [
+        "tutorial/body.md"
+      ],
+      "retrieved_documents": [
+        "tutorial/schema-extra-example.md",
+        "tutorial/body.md",
+        "advanced/json-base64-bytes.md",
+        "tutorial/request-files.md",
+        "tutorial/handling-errors.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 0.5
+    },
+    {
+      "id": "q006",
+      "difficulty": "easy",
+      "topic": "parameters",
+      "question": "How do you declare a path parameter in FastAPI?",
+      "gold_documents": [
+        "tutorial/path-params.md"
+      ],
+      "retrieved_documents": [
+        "tutorial/path-params.md",
+        "tutorial/path-params.md",
+        "tutorial/path-params-numeric-validations.md",
+        "advanced/response-headers.md",
+        "advanced/response-change-status-code.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "q009",
+      "difficulty": "easy",
+      "topic": "parameters",
+      "question": "How do you declare a header parameter in FastAPI?",
+      "gold_documents": [
+        "tutorial/header-params.md"
+      ],
+      "retrieved_documents": [
+        "tutorial/header-param-models.md",
+        "tutorial/header-param-models.md",
+        "tutorial/header-params.md",
+        "tutorial/header-param-models.md",
+        "tutorial/header-params.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 0.3333333333333333
+    },
+    {
+      "id": "q012",
+      "difficulty": "easy",
+      "topic": "validation",
+      "question": "How do you add numeric validation constraints (like a minimum value) to a path parameter?",
+      "gold_documents": [
+        "tutorial/path-params-numeric-validations.md"
+      ],
+      "retrieved_documents": [
+        "tutorial/path-params-numeric-validations.md",
+        "tutorial/path-params-numeric-validations.md",
+        "tutorial/path-params-numeric-validations.md",
+        "tutorial/path-params-numeric-validations.md",
+        "tutorial/query-params-str-validations.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "q015",
+      "difficulty": "easy",
+      "topic": "response",
+      "question": "How do you set a custom HTTP status code for a successful response?",
+      "gold_documents": [
+        "tutorial/response-status-code.md"
+      ],
+      "retrieved_documents": [
+        "advanced/additional-status-codes.md",
+        "tutorial/response-status-code.md",
+        "tutorial/response-status-code.md",
+        "advanced/response-change-status-code.md",
+        "tutorial/path-operation-configuration.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 0.5
+    },
+    {
+      "id": "q018",
+      "difficulty": "easy",
+      "topic": "openapi",
+      "question": "Where can you find the automatically generated interactive API documentation for a FastAPI app?",
+      "gold_documents": [
+        "features.md",
+        "tutorial/first-steps.md"
+      ],
+      "retrieved_documents": [
+        "index.md",
+        "tutorial/first-steps.md",
+        "index.md",
+        "tutorial/first-steps.md",
+        "features.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 0.5
+    },
+    {
+      "id": "q023",
+      "difficulty": "medium",
+      "topic": "dependencies",
+      "question": "How do you create a dependency that runs cleanup code after the request is handled?",
+      "gold_documents": [
+        "tutorial/dependencies/dependencies-with-yield.md"
+      ],
+      "retrieved_documents": [
+        "tutorial/dependencies/dependencies-with-yield.md",
+        "release-notes.md",
+        "tutorial/dependencies/dependencies-with-yield.md",
+        "advanced/advanced-dependencies.md",
+        "tutorial/middleware.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "q026",
+      "difficulty": "medium",
+      "topic": "cors",
+      "question": "How do you enable CORS (Cross-Origin Resource Sharing) in a FastAPI application?",
+      "gold_documents": [
+        "tutorial/cors.md"
+      ],
+      "retrieved_documents": [
+        "tutorial/cors.md",
+        "tutorial/cors.md",
+        "tutorial/cors.md",
+        "tutorial/cors.md",
+        "tutorial/cors.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "q029",
+      "difficulty": "medium",
+      "topic": "security",
+      "question": "How do you hash passwords and issue JWT access tokens for login in FastAPI?",
+      "gold_documents": [
+        "tutorial/security/oauth2-jwt.md"
+      ],
+      "retrieved_documents": [
+        "tutorial/security/oauth2-jwt.md",
+        "tutorial/security/oauth2-jwt.md",
+        "tutorial/security/simple-oauth2.md",
+        "tutorial/security/oauth2-jwt.md",
+        "tutorial/security/oauth2-jwt.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "q032",
+      "difficulty": "medium",
+      "topic": "testing",
+      "question": "How do you test a FastAPI application without running a live server?",
+      "gold_documents": [
+        "tutorial/testing.md"
+      ],
+      "retrieved_documents": [
+        "advanced/async-tests.md",
+        "reference/testclient.md",
+        "tutorial/first-steps.md",
+        "deployment/concepts.md",
+        "tutorial/testing.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 0.2
+    },
+    {
+      "id": "q035",
+      "difficulty": "medium",
+      "topic": "file-upload",
+      "question": "How do you accept both form fields and file uploads in the same request?",
+      "gold_documents": [
+        "tutorial/request-forms-and-files.md"
+      ],
+      "retrieved_documents": [
+        "tutorial/request-forms-and-files.md",
+        "tutorial/request-files.md",
+        "tutorial/request-forms-and-files.md",
+        "tutorial/request-forms-and-files.md",
+        "tutorial/request-files.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "q038",
+      "difficulty": "medium",
+      "topic": "validation",
+      "question": "How do you declare a request body with nested Pydantic models, like a list of sub-objects?",
+      "gold_documents": [
+        "tutorial/body-nested-models.md"
+      ],
+      "retrieved_documents": [
+        "tutorial/body-nested-models.md",
+        "tutorial/body-nested-models.md",
+        "tutorial/body-nested-models.md",
+        "tutorial/body-nested-models.md",
+        "tutorial/body.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "q043",
+      "difficulty": "hard",
+      "topic": "openapi",
+      "question": "How do you customize the generated OpenAPI schema, for example to change its structure before it's served?",
+      "gold_documents": [
+        "how-to/extending-openapi.md"
+      ],
+      "retrieved_documents": [
+        "tutorial/metadata.md",
+        "how-to/extending-openapi.md",
+        "how-to/extending-openapi.md",
+        "advanced/path-operation-advanced-configuration.md",
+        "how-to/extending-openapi.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 0.5
+    },
+    {
+      "id": "q046",
+      "difficulty": "hard",
+      "topic": "testing",
+      "question": "How do you write automated tests for a WebSocket endpoint?",
+      "gold_documents": [
+        "advanced/testing-websockets.md"
+      ],
+      "retrieved_documents": [
+        "advanced/testing-websockets.md",
+        "advanced/websockets.md",
+        "advanced/websockets.md",
+        "advanced/websockets.md",
+        "advanced/websockets.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "q049",
+      "difficulty": "hard",
+      "topic": "lifecycle",
+      "question": "How do you run startup and shutdown logic for a FastAPI application, such as initializing a database connection pool?",
+      "gold_documents": [
+        "advanced/events.md"
+      ],
+      "retrieved_documents": [
+        "advanced/events.md",
+        "advanced/events.md",
+        "release-notes.md",
+        "advanced/events.md",
+        "deployment/manually.md"
+      ],
+      "hit_at_k": true,
+      "reciprocal_rank": 1.0
+    }
+  ]
+}

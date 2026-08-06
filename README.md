@@ -28,19 +28,39 @@ includes an honest audit trail:
 
 ## Results
 
-| metric | before | after |
-|---|:---:|:---:|
-| Recall@5 | 88.0% | **90.0%** |
-| MRR | 0.792 | 0.792-0.796* |
+<img src="results/charts/before_after.png" width="420" alt="Before/after the reranker-blend fix: Recall@5 88.0 to 90.0, MRR 79.2 to 79.6">
+<img src="results/charts/recall_mrr_by_difficulty.png" width="420" alt="Recall@5 and MRR broken down by easy/medium/hard difficulty">
+
+| metric | before | after (full 50-question set) | after (15-question held-out set) |
+|---|:---:|:---:|:---:|
+| Recall@5 | 88.0% | **90.0%** | 100.0%\*\* |
+| MRR | 0.792 | 0.792-0.796\* | 0.769\*\* |
 
 \* small run-to-run floating-point jitter in the cross-encoder means MRR
 isn't perfectly reproducible bit-for-bit; see `AUDIT.md`. Recall@5 is
 stable across runs.
 
+\*\* the "full 50" column has a data-leakage caveat -- the reranker blend
+weight was tuned against those same 50 questions. The held-out column is
+15 questions never used for tuning, but by chance it doesn't contain any
+of the 6 originally-diagnosed failure cases, so treat 100% as "no
+regressions on unseen questions," not "the fix generalizes perfectly."
+Full writeup: [`results/failure_analysis.md`](results/failure_analysis.md#correcting-the-evaluation-methodology-tuning-vs-held-out).
+
 Measured against a 50-question hand-labeled test set
 (`data/test_set.json`, 20 easy / 20 medium / 10 hard, covering routing,
 parameters, Pydantic validation, dependencies, security, WebSockets,
 background tasks, testing, deployment, and more).
+
+### Where the baseline failures came from
+
+<img src="results/charts/failure_stages.png" width="480" alt="Root cause breakdown of the 6 baseline retrieval misses: 0 not found by search, 1 lost in fusion pool size, 5 demoted by reranker">
+
+5 of the 6 baseline misses weren't a search problem at all -- the correct
+document was already found by semantic and/or keyword search, then pushed
+out of the final top-5 by the cross-encoder reranker. See
+[`results/failure_analysis.md`](results/failure_analysis.md) for the
+per-question breakdown and root-cause analysis.
 
 ## Architecture
 
@@ -133,6 +153,28 @@ echo "ANTHROPIC_API_KEY=sk-ant-..." > .env
 python src/generation.py "How do I handle a 404 error in FastAPI?"
 ```
 
+## Deploying the dashboard (free)
+
+Streamlit Community Cloud deploys straight from this GitHub repo:
+
+1. Go to [share.streamlit.io](https://share.streamlit.io), sign in with
+   GitHub, click **New app**, pick this repo, branch `main`, and set the
+   main file path to `dashboard/app.py`.
+2. Under **Advanced settings → Secrets**, add:
+   ```toml
+   ANTHROPIC_API_KEY = "sk-ant-..."
+   ```
+   (only needed once there's credit on the account -- without it the app
+   still deploys and runs, generation just shows the same graceful "not
+   configured" message it does locally).
+3. Deploy. First load takes a minute or two: `data/chroma/` (the vector
+   store) isn't committed to git -- it's binary and derived, not source --
+   so `dashboard/app.py` detects it's missing on a fresh deployment and
+   rebuilds it from the committed `data/processed/fastapi_docs.json`
+   automatically. Every load after that is fast.
+
+No credit card, no server to manage, free tier is enough for a portfolio demo.
+
 ## Current limitations
 
 Documented in full in [`AUDIT.md`](AUDIT.md). The headline ones:
@@ -142,8 +184,11 @@ Documented in full in [`AUDIT.md`](AUDIT.md). The headline ones:
   none of it has been exercised against a live response yet.
 - **The Recall@5/MRR headline numbers have a data-leakage caveat**: the
   reranker blend weight was tuned against the same 50-question set now
-  used to report the result. A tuning/held-out split is planned but not
-  yet done.
+  used to report the result. A tuning/held-out split now exists
+  (`data/test_set.json`'s `held_out` field, `evaluation.py --held-out-only`)
+  for future parameter changes, but this specific past decision can't be
+  retroactively un-leaked -- see the Results section above and
+  `results/failure_analysis.md`.
 - Unit tests (`tests/test_ingestion.py`, `tests/test_retrieval.py`, 19
   cases, both run in CI) cover the pure ingestion/retrieval-scoring
   functions; no tests for `generation.py` yet -- hard to test meaningfully
